@@ -1,9 +1,6 @@
 # GovAid 🇮🇳
 
 > **A modern citizen welfare portal** — connecting every Indian citizen to government schemes they are eligible for, instantly.
-
-![GovAid Home]
-
 ---
 
 ## 📋 Overview
