@@ -3,368 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GovAid | Citizen Portal</title>
+    <title>GovAid | Modern Citizen Welfare</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
-    <div class="app-wrapper" id="main-wrapper">
-        <div class="glass-container">
-            <!-- ALERT TOAST -->
-            <div id="toast" class="toast hidden"></div>
+    <div id="toast" class="toast"></div>
 
-            <!-- WELCOME SCREEN -->
-            <section id="welcome-screen" class="screen active">
-                <div class="header-graphic">
-                    <i class="fa-solid fa-clock-rotate-left background-icon"></i>
-                    <i class="fa-solid fa-building-columns main-icon"></i>
-                </div>
-                <h1 class="brand-title">GovAid</h1>
-                <p class="brand-tagline">Empowering Citizens, Delivering Welfare Instantly.</p>
-                <div class="action-buttons">
-                    <button class="btn btn-primary" onclick="app.navigate('login-screen')">Secure Login</button>
-                    <button class="btn btn-secondary" onclick="app.navigate('signup-screen')">Register as Citizen</button>
-                </div>
-            </section>
+    <!-- LANDING / HOME PAGE -->
+    <section id="welcome-screen" class="screen active">
+        <!-- Minimal Nav -->
+        <nav style="width: 100%; max-width: 1200px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 5rem;">
+            <div class="sidebar-brand" style="margin-bottom: 0; color: var(--primary); font-size: 2rem; font-weight: bold;">
+                GovAid.
+            </div>
+            <div style="display: flex; gap: 1rem; align-items: center;">
+                <a href="admin-login.html" class="btn btn-secondary" style="padding: 0.75rem 1.5rem;">
+                    <i data-lucide="shield" style="width:15px; vertical-align:middle; margin-right:4px;"></i>Admin
+                </a>
+                <a href="login.html" class="btn btn-secondary" style="padding: 0.75rem 1.5rem;">Login</a>
+                <a href="signup.html" class="btn btn-primary" style="padding: 0.75rem 1.5rem;">Get Started <i data-lucide="arrow-right"></i></a>
+            </div>
+        </nav>
 
-            <!-- LOGIN SCREEN -->
-            <section id="login-screen" class="screen hidden">
-                <div class="nav-header">
-                    <button class="btn-icon" onclick="app.navigate('welcome-screen')"><i class="fa-solid fa-arrow-left"></i></button>
-                    <h2>Login Portal</h2>
-                </div>
-                <form id="login-form" onsubmit="app.handleLogin(event)">
-                    <div class="input-group has-icon">
-                        <label>Aadhaar ID (12 Digits)</label>
-                        <i class="fa-regular fa-id-card input-icon"></i>
-                        <input type="text" id="login-aadhaar" placeholder="0000 0000 0000" maxlength="12" pattern="\d{12}" required>
-                    </div>
-                    <div class="input-group has-icon">
-                        <label>Email Address</label>
-                        <i class="fa-regular fa-envelope input-icon"></i>
-                        <input type="email" id="login-email" placeholder="citizen@example.com" required>
-                    </div>
-                    <div class="input-group has-icon">
-                        <label>Password</label>
-                        <i class="fa-solid fa-lock input-icon"></i>
-                        <input type="password" id="login-password" placeholder="••••••••" required>
-                    </div>
-                    <div class="otp-section">
-                        <div class="input-group otp-input-wrapper">
-                            <label>Verification OTP</label>
-                            <input type="text" id="login-otp" placeholder="6-digit OTP" maxlength="6" disabled>
-                        </div>
-                        <button type="button" class="btn btn-outline" id="btn-send-otp" onclick="app.simulateOTP()">Send OTP</button>
-                    </div>
-                    <div class="form-footer">
-                        <a href="#" class="forgot-link">Forgot Password?</a>
-                        <button type="submit" class="btn btn-primary btn-full" id="btn-login" disabled>Login via GovAid</button>
-                    </div>
-                </form>
-            </section>
-
-            <!-- SIGNUP SCREEN -->
-            <section id="signup-screen" class="screen hidden">
-                <div class="nav-header">
-                    <button class="btn-icon" onclick="app.navigate('welcome-screen')"><i class="fa-solid fa-arrow-left"></i></button>
-                    <h2>Citizen Registration</h2>
-                </div>
-                <form id="signup-form" onsubmit="app.handleSignup(event)" class="scrollable-form">
-                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                        <div class="input-group">
-                            <label>First Name</label>
-                            <input type="text" name="first_name" required>
-                        </div>
-                        <div class="input-group">
-                            <label>Last Name</label>
-                            <input type="text" name="last_name" required>
-                        </div>
-                    </div>
-
-                    <div class="input-group">
-                        <label>Email Address</label>
-                        <input type="email" name="email" required>
-                    </div>
-
-                    <div class="input-group">
-                        <label>Password</label>
-                        <input type="password" name="password" required>
-                    </div>
-
-                    <div class="input-group">
-                        <label>Aadhaar ID (12 Digits)</label>
-                        <input type="text" name="aadhaar" maxlength="12" pattern="\d{12}" required>
-                    </div>
-
-                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                        <div class="input-group">
-                            <label>Date of Birth</label>
-                            <input type="date" name="dob" required>
-                        </div>
-                        <div class="input-group">
-                            <label>Gender</label>
-                            <select name="gender" required>
-                                <option value="MALE">Male</option>
-                                <option value="FEMALE">Female</option>
-                                <option value="OTHER">Other</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="input-group">
-                        <label>Annual Income (₹)</label>
-                        <input type="number" name="income" min="0" required>
-                    </div>
-
-                    <div class="input-group">
-                        <label>Occupation</label>
-                        <select name="occupation" required>
-                            <option value="Student">Student</option>
-                            <option value="Farmer">Farmer</option>
-                            <option value="Unemployed">Unemployed</option>
-                            <option value="Employed">Salaried / Employed</option>
-                            <option value="Business">Business</option>
-                        </select>
-                    </div>
-
-                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                        <div class="input-group">
-                            <label>City</label>
-                            <input type="text" name="city">
-                        </div>
-                        <div class="input-group">
-                            <label>State</label>
-                            <select name="state" required>
-                                <option value="Tamil Nadu">Tamil Nadu</option>
-                                <option value="Delhi">Delhi</option>
-                                <option value="Kerala">Kerala</option>
-                                <option value="Maharashtra">Maharashtra</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary btn-full mt-4" id="btn-signup">Complete Registration</button>
-                </form>
-            </section>
-
-            <!-- 💥 DASHBOARD SCREEN 💥 -->
-            <section id="dashboard-screen" class="screen hidden dashboard-layout">
-                <aside class="sidebar">
-                    <div class="sidebar-brand">
-                        <i class="fa-solid fa-building-columns"></i> GovAid
-                    </div>
-                    <nav class="sidebar-nav">
-                        <a href="#tab-overview" class="nav-item active">
-                            <i class="fa-solid fa-chart-pie"></i> Dashboard
+        <div class="hero-content">
+            <!-- TWO-COLUMN HERO -->
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 4rem; text-align: left; margin-bottom: 8rem;">
+                <!-- Left: Text -->
+                <div style="flex: 1; min-width: 0;">
+                    <h1 class="brand-title" style="text-align: left;">Empowering citizens through direct welfare.</h1>
+                    <p class="brand-tagline" style="text-align: left; margin: 0 0 3rem;">Access verified government schemes instantly. Transparent, direct, and designed for every citizen of India.</p>
+                    <div class="cta-group" style="justify-content: flex-start;">
+                        <a href="signup.html" class="btn btn-primary">
+                            Start Registration <i data-lucide="arrow-right"></i>
                         </a>
-                        <a href="#directory-anchor" class="nav-item">
-                            <i class="fa-solid fa-layer-group"></i> All Schemes
+                        <a href="#features" class="btn btn-secondary">
+                            Learn More
                         </a>
-                        <a href="#" class="nav-item logout-nav" onclick="app.logout()">
-                            <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
-                        </a>
-                    </nav>
-                </aside>
-                
-                <main class="dashboard-main">
-                    <!-- Top section -->
-                    <header class="dashboard-topbar">
-                        <div class="user-greeting">
-                            <h2 id="dash-greeting">Welcome back, <span>Ramesh</span></h2>
-                            <p id="dash-details">43 yrs • Male • Madurai, Tamil Nadu</p>
-                        </div>
-                        <img src="https://ui-avatars.com/api/?name=Ramesh+Kumar&background=E6A817&color=fff&rounded=true" class="profile-pic" id="dash-avatar" onclick="app.toggleProfile()" style="cursor:pointer">
-                    </header>
-
-                    <!-- TAB: OVERVIEW -->
-                    <div class="dashboard-scrollable" id="tab-overview">
-                        <!-- Stats Grid -->
-                        <div class="stats-grid">
-                            <div class="stat-card c-teal">
-                                <i class="fa-solid fa-landmark stat-icon"></i>
-                                <div class="stat-data">
-                                    <h3 class="counter" data-target="150">0</h3>
-                                    <p>Central Schemes</p>
-                                </div>
-                            </div>
-                            <div class="stat-card c-gold">
-                                <i class="fa-solid fa-map-location-dot stat-icon"></i>
-                                <div class="stat-data">
-                                    <h3 class="counter" data-target="85">0</h3>
-                                    <p>Tamil Nadu Schemes</p>
-                                </div>
-                            </div>
-                            <div class="stat-card c-navy">
-                                <i class="fa-solid fa-check-circle stat-icon"></i>
-                                <div class="stat-data">
-                                    <h3 class="counter" data-target="12">0</h3>
-                                    <p>Eligible For You</p>
-                                </div>
-                            </div>
-                            <div class="stat-card c-green">
-                                <i class="fa-solid fa-file-signature stat-icon"></i>
-                                <div class="stat-data">
-                                    <h3 class="counter" data-target="3">0</h3>
-                                    <p>Applied Schemes</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- City Insights -->
-                        <h3 class="section-title">Insights for Madurai</h3>
-                        <div class="insights-grid">
-                            <div class="insight-card">
-                                <h4><i class="fa-solid fa-users"></i> Local Applicants</h4>
-                                <p class="insight-val counter" data-target="12450">0</p>
-                            </div>
-                            <div class="insight-card">
-                                <h4><i class="fa-solid fa-hand-holding-dollar"></i> Active Beneficiaries</h4>
-                                <p class="insight-val counter" data-target="8200">0</p>
-                            </div>
-                            <div class="insight-card">
-                                <h4><i class="fa-solid fa-fire"></i> Popular Scheme</h4>
-                                <p class="insight-val" style="color: var(--teal)">Uzhavar Sandhai</p>
-                            </div>
-                        </div>
-
-                        <!-- Eligible Now -->
-                        <div class="section-header">
-                            <h3 class="section-title">Eligible Now</h3>
-                            <button class="btn-link" onclick="app.switchTab(null, 'browse')">View All</button>
-                        </div>
-                        <div class="scheme-slider" id="eligible-now-container">
-                            <!-- Cards populated by JS -->
-                        </div>
-
-                        <!-- Eligible Soon -->
-                        <h3 class="section-title">Eligible Soon (Life Events Radar)</h3>
-                        <div class="soon-timeline">
-                            <div class="timeline-item">
-                                <div class="tl-icon tl-blue"><i class="fa-solid fa-cake-candles"></i></div>
-                                <div class="tl-content">
-                                    <h4>Turning 60 (Senior Citizen)</h4>
-                                    <p>Unlocks: Atal Pension Yojana, Vaya Vandana Yojana</p>
-                                </div>
-                            </div>
-                            <div class="timeline-item">
-                                <div class="tl-icon tl-green"><i class="fa-solid fa-house"></i></div>
-                                <div class="tl-content">
-                                    <h4>Buying First House</h4>
-                                    <p>Unlocks: PM Awas Yojana Housing Subsidies</p>
-                                </div>
-                            </div>
-                            <div class="timeline-item">
-                                <div class="tl-icon tl-orange"><i class="fa-solid fa-seedling"></i></div>
-                                <div class="tl-content">
-                                    <h4>Becoming a Farmer</h4>
-                                    <p>Unlocks: PM-KISAN, Free Electricity Subsidy</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- CONTINUOUS BROWSE DIRECTORY -->
-                        <div id="directory-anchor" style="padding-top: 3rem;"></div>
-                        <div class="browse-header">
-                              <h2 class="section-title" style="margin-top:0;">Browse Schemes Directory</h2>
-                              <div class="search-sort-bar">
-                                  <div class="search-box">
-                                      <i class="fa-solid fa-magnifying-glass"></i>
-                                      <input type="text" placeholder="Search by scheme name or description..." id="scheme-search" oninput="app.filterSchemes()">
-                                  </div>
-                                  <select class="sort-select" id="scheme-sort" onchange="app.filterSchemes()">
-                                      <option value="newest">Newest First</option>
-                                      <option value="benefit">Highest Benefit</option>
-                                  </select>
-                              </div>
-                              <div class="filter-tabs" id="filter-tabs">
-                                  <button class="filter-btn active" onclick="app.setFilter('All', this)">All</button>
-                                  <button class="filter-btn" onclick="app.setFilter('Central', this)">Central Govt</button>
-                                  <button class="filter-btn" onclick="app.setFilter('Tamil Nadu', this)">Tamil Nadu</button>
-                                  <button class="filter-btn" onclick="app.setFilter('Farmer', this)">Farmer</button>
-                                  <button class="filter-btn" onclick="app.setFilter('Health', this)">Health</button>
-                                  <button class="filter-btn" onclick="app.setFilter('Women', this)">Women</button>
-                                  <button class="filter-btn" onclick="app.setFilter('Student', this)">Student</button>
-                              </div>
-                        </div>
-                        <div class="browse-grid" id="browse-schemes-container">
-                              <!-- JS injected matching schemes -->
-                        </div>
-
                     </div>
-                </main>
-                
-                <!-- PROFILE SLIDEBAR -->
-                <aside id="profile-slidebar" class="profile-slidebar">
-                    <button class="profile-close" onclick="app.toggleProfile()"><i class="fa-solid fa-xmark"></i></button>
-                    <img src="https://ui-avatars.com/api/?name=Ramesh+Kumar&background=E6A817&color=fff&rounded=true" class="profile-avatar-large" id="sidebar-avatar">
-                    <div class="profile-card-details">
-                        <h3 id="side-name">Ramesh Kumar</h3>
-                        <p class="tagline" id="side-sub">Citizen ID: Gov-102</p>
-                        
-                        <div class="pd-row"><span class="lbl"><i class="fa-solid fa-id-card"></i> Aadhaar</span><span class="val" id="side-aadhaar">XXXX XXXX 9012</span></div>
-                        <div class="pd-row"><span class="lbl"><i class="fa-solid fa-envelope"></i> Email</span><span class="val" id="side-email">ramesh@email.com</span></div>
-                        <div class="pd-row"><span class="lbl"><i class="fa-solid fa-briefcase"></i> Occupation</span><span class="val" id="side-occ">Farmer</span></div>
-                        <div class="pd-row"><span class="lbl"><i class="fa-solid fa-wallet"></i> Ann. Income</span><span class="val" id="side-inc">₹ 1,50,000</span></div>
-                        <div class="pd-row"><span class="lbl"><i class="fa-solid fa-map-location-dot"></i> State</span><span class="val" id="side-state">Tamil Nadu</span></div>
-                    </div>
-                </aside>
-
-            </section>
-
-            <!-- SCHEME DETAIL MODAL -->
-            <div id="scheme-modal" class="modal-overlay hidden">
-                <div class="modal-box">
-                    <button class="modal-close" onclick="app.closeModal()"><i class="fa-solid fa-xmark"></i></button>
-                    <div class="modal-header">
-                        <span id="modal-auth-badge" class="scheme-auth-badge badge-central">Central Govt</span>
-                        <h2 id="modal-scheme-name">Scheme Name</h2>
-                        <p id="modal-scheme-desc" class="modal-subtitle">Simplified short description goes here.</p>
-                    </div>
-                    
-                    <div class="modal-body">
-                        <div class="modal-section-grid">
-                            <div class="m-card">
-                                <h4><i class="fa-solid fa-hand-holding-dollar"></i> Core Benefit</h4>
-                                <h3 id="modal-benefit" style="color:var(--success); font-size:1.6rem; font-weight:800;">₹ 0</h3>
-                            </div>
-                            <div class="m-card">
-                                <h4><i class="fa-solid fa-clock-rotate-left"></i> Tenure</h4>
-                                <h3 id="modal-tenure" style="color:var(--primary); font-size:1.4rem;">Lifetime</h3>
-                            </div>
-                        </div>
-
-                        <div class="m-section">
-                            <h4><i class="fa-solid fa-landmark"></i> Official Mandate</h4>
-                            <p id="modal-official-desc" class="modal-text">Official description fetched directly from the schema.</p>
-                        </div>
-
-                        <div class="m-section">
-                            <h4><i class="fa-solid fa-clipboard-check"></i> Eligibility Criteria Match</h4>
-                            <div id="modal-criteria" class="modal-criteria-box">
-                                <!-- Generated list of criteria -->
-                            </div>
-                        </div>
-                        
-                        <div class="m-section">
-                            <h4><i class="fa-solid fa-folder-open"></i> Required Documents</h4>
-                            <ul class="modal-list">
-                                <li>Aadhaar Card (Native ID)</li>
-                                <li>Active Bank Details / Valid Passbook</li>
-                                <li>Income Certification</li>
-                                <li>Residence / Domicile Proof</li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <div class="modal-footer">
-                        <button class="btn btn-secondary" onclick="app.closeModal()"><i class="fa-solid fa-arrow-left"></i> Go Back</button>
-                        <button class="btn btn-primary" id="modal-btn-apply" onclick="app.submitApplication()"><i class="fa-solid fa-paper-plane"></i> Submit Application</button>
-                    </div>
+                </div>
+                <!-- Right: Image -->
+                <div style="flex: 1; min-width: 0; display: flex; justify-content: center;">
+                    <img src="hero.png" alt="GovAid Dashboard Preview"
+                         style="width: 100%; max-width: 360px; mix-blend-mode: multiply;">
                 </div>
             </div>
 
+            <!-- FEATURES SECTION -->
+            <div id="features" style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin-top: 0; text-align: left;">
+                <div class="stat-card" style="min-height: 280px; display:flex; flex-direction:column; justify-content:space-between; padding: 2.5rem;">
+                    <div class="stat-icon"><i data-lucide="shield-check"></i></div>
+                    <h3>Verified Schemes</h3>
+                    <p style="color: var(--text-muted); margin-top: 1rem;">Directly sourced from official gazettes. No middlemen, no confusion.</p>
+                </div>
+                <div class="stat-card" style="min-height: 280px; display:flex; flex-direction:column; justify-content:space-between; padding: 2.5rem;">
+                    <div class="stat-icon"><i data-lucide="zap"></i></div>
+                    <h3>Instant Eligibility</h3>
+                    <p style="color: var(--text-muted); margin-top: 1rem;">Our engine matches your profile to thousands of schemes in seconds.</p>
+                </div>
+                <div class="stat-card" style="min-height: 280px; display:flex; flex-direction:column; justify-content:space-between; padding: 2.5rem;">
+                    <div class="stat-icon"><i data-lucide="cpu"></i></div>
+                    <h3>Automated Tracking</h3>
+                    <p style="color: var(--text-muted); margin-top: 1rem;">Monitor your application status from submission to final approval.</p>
+                </div>
+            </div>
+
+            <!-- TRUST SECTION -->
+            <div style="margin-top: 10rem; padding: 5rem; background: var(--primary); border-radius: var(--radius-card); color: white;">
+                <h2 style="font-size: 3rem; margin-bottom: 1rem;">300+ Active Schemes</h2>
+                <p style="font-size: 1.25rem; opacity: 0.8;">Covering Health, Agriculture, Education, and more for every state in India.</p>
+            </div>
         </div>
-    </div>
+
+        <footer style="margin-top: 10rem; padding: 4rem; color: var(--text-muted); font-size: 0.9rem;">
+            &copy; 2026 GovAid. Inspired by Stratex Design.
+        </footer>
+    </section>
+
     <script src="app.js"></script>
 </body>
 </html>

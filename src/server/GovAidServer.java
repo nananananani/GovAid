@@ -189,15 +189,20 @@ public class GovAidServer {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
             try {
-                String json = service.EligibilityEngine.getAllSchemesJSON();
+                String query = exchange.getRequestURI().getQuery();
+                int citizenId = (query != null && query.contains("=")) ? Integer.parseInt(query.split("=")[1]) : 0;
+                String json = service.EligibilityEngine.getAllSchemesJSON(citizenId);
                 byte[] bytes = json.getBytes("UTF-8");
                 exchange.getResponseHeaders().set("Content-Type", "application/json");
                 exchange.sendResponseHeaders(200, bytes.length);
                 OutputStream os = exchange.getResponseBody();
                 os.write(bytes);
                 os.close();
-            } catch(Exception e) {}
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
         }
+
     }
 
     /**
@@ -237,21 +242,27 @@ public class GovAidServer {
                 int citizenId = Integer.parseInt(query.split("=")[1]);
                 
                 String json = "{}";
-                String sql = "SELECT first_name, last_name, email, aadhaar_number, occupation, annual_income, state_of_residence, city, " +
-                             "(SELECT COUNT(*) FROM CitizenSchemeSelection WHERE citizen_id = ?) as applied_count " + 
-                             "FROM Citizen WHERE citizen_id = ?";
+                String sql = "SELECT * FROM Citizen WHERE citizen_id = ?";
+                String countSql = "SELECT COUNT(*) FROM CitizenSchemeSelection WHERE citizen_id = ?";
                              
                 java.sql.Connection conn = util.DBConnection.getConnection();
                 if(conn != null) {
+                    int appliedCount = 0;
+                    try(java.sql.PreparedStatement ps = conn.prepareStatement(countSql)) {
+                        ps.setInt(1, citizenId);
+                        java.sql.ResultSet rs = ps.executeQuery();
+                        if(rs.next()) appliedCount = rs.getInt(1);
+                    }
+
                     try(java.sql.PreparedStatement ps = conn.prepareStatement(sql)) {
                         ps.setInt(1, citizenId);
-                        ps.setInt(2, citizenId);
                         java.sql.ResultSet rs = ps.executeQuery();
                         if(rs.next()) {
-                            json = String.format("{\"first_name\":\"%s\", \"last_name\":\"%s\", \"email\":\"%s\", \"aadhaar\":\"%s\", \"occupation\":\"%s\", \"income\":%f, \"state\":\"%s\", \"city\":\"%s\", \"applied_count\":%d}",
-                                rs.getString("first_name").replace("\"", ""), rs.getString("last_name").replace("\"", ""), rs.getString("email").replace("\"", ""), 
-                                rs.getString("aadhaar_number").replace("\"", ""), rs.getString("occupation").replace("\"", ""), rs.getDouble("annual_income"),
-                                rs.getString("state_of_residence").replace("\"", ""), rs.getString("city") == null ? "" : rs.getString("city").replace("\"", ""), rs.getInt("applied_count"));
+                            json = String.format("{\"first_name\":\"%s\", \"last_name\":\"%s\", \"email\":\"%s\", \"aadhaar_number\":\"%s\", \"date_of_birth\":\"%s\", \"gender\":\"%s\", \"occupation\":\"%s\", \"annual_income\":%.2f, \"state_of_residence\":\"%s\", \"city\":\"%s\", \"applied_count\":%d}",
+                                rs.getString("first_name"), rs.getString("last_name"), rs.getString("email"), 
+                                rs.getString("aadhaar_number"), rs.getDate("date_of_birth").toString(), rs.getString("gender"),
+                                rs.getString("occupation"), rs.getDouble("annual_income"),
+                                rs.getString("state_of_residence"), rs.getString("city") == null ? "" : rs.getString("city"), appliedCount);
                         }
                     }
                 }
@@ -262,7 +273,10 @@ public class GovAidServer {
                 OutputStream os = exchange.getResponseBody();
                 os.write(bytes);
                 os.close();
-            } catch(Exception e) {}
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
         }
+
     }
 }

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | GovAid</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body style="display:flex; align-items:center; justify-content:center; min-height:100vh; background: #EEEEF2;">
+
+    <div id="toast" class="toast"></div>
+
+    <div class="glass-container form-container" style="animation: fadeIn 0.5s ease;">
+        <a href="index.html" class="btn-icon" style="margin-bottom:1rem; display:inline-block; color:var(--text-main);">
+            <i data-lucide="arrow-left"></i>
+        </a>
+        <h2 style="font-size: 2rem; margin-bottom: 0.5rem;">Welcome Back</h2>
+        <p style="color:var(--text-muted); margin-bottom: 2rem;">Sign in to access your eligible schemes.</p>
+        
+        <form onsubmit="app.handleLogin(event)">
+            <div class="input-group">
+                <label>Email Address</label>
+                <div class="input-wrapper">
+                    <i data-lucide="mail"></i>
+                    <input type="email" id="login-email" placeholder="name@email.com" required>
+                </div>
+            </div>
+            <div class="input-group">
+                <label>Password</label>
+                <div class="input-wrapper">
+                    <i data-lucide="lock"></i>
+                    <input type="password" id="login-password" placeholder="••••••••" required>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center; margin-top:1rem;">
+                Sign In Securely
+            </button>
+        </form>
+
+        <p style="margin-top: 1.5rem; text-align: center; font-size: 0.875rem; color: var(--text-muted);">
+            Don't have an account? <a href="signup.html" style="color:var(--primary); font-weight:600; text-decoration:none;">Register here</a>
+        </p>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

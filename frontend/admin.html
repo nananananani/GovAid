@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | GovAid</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .admin-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+        .admin-stat-card {
+            background: var(--surface);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 1.75rem;
+        }
+        .admin-stat-card .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+        .admin-stat-card .stat-val {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            font-family: 'Hedvig Letters Serif', serif;
+        }
+        .admin-stat-card .stat-sub {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+        .admin-stat-card.blue .stat-val  { color: #3b82f6; }
+        .admin-stat-card.amber .stat-val { color: #d97706; }
+        .admin-stat-card.red .stat-val   { color: #dc2626; }
+
+        .panel {
+            background: var(--surface);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        .panel h3 {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-main);
+        }
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+
+        .bar-row { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem; }
+        .bar-label { font-size: 0.8rem; color: var(--text-muted); width: 130px; flex-shrink: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .bar-track { flex: 1; background: var(--primary-soft); border-radius: 50px; height: 8px; overflow: hidden; }
+        .bar-fill { height: 100%; border-radius: 50px; background: var(--primary); transition: width 0.6s ease; }
+        .bar-count { font-size: 0.8rem; color: var(--text-muted); width: 24px; text-align: right; }
+
+        .admin-table { width: 100%; border-collapse: collapse; }
+        .admin-table th {
+            text-align: left;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--glass-border);
+        }
+        .admin-table td {
+            padding: 0.9rem 1rem;
+            font-size: 0.875rem;
+            color: var(--text-main);
+            border-bottom: 1px solid var(--glass-border);
+        }
+        .admin-table tr:last-child td { border-bottom: none; }
+        .admin-table tr:hover td { background: var(--primary-soft); }
+
+        .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+        .search-input {
+            background: var(--background);
+            border: 1px solid var(--glass-border);
+            border-radius: 50px;
+            padding: 0.55rem 1.25rem;
+            color: var(--text-main);
+            font-family: inherit;
+            font-size: 0.875rem;
+            outline: none;
+            width: 280px;
+            transition: border-color 0.2s;
+        }
+        .search-input:focus { border-color: var(--primary); }
+        .search-input::placeholder { color: var(--text-muted); }
+
+        .action-btn {
+            border: none; padding: 0.3rem 0.8rem; border-radius: 50px;
+            font-size: 0.75rem; font-weight: 600; cursor: pointer;
+            font-family: inherit; transition: all 0.2s;
+        }
+        .action-btn.approve { background: #DCFCE7; color: #166534; }
+        .action-btn.approve:hover { background: #bbf7d0; }
+        .action-btn.reject  { background: #FEE2E2; color: #991B1B; }
+        .action-btn.reject:hover  { background: #fecaca; }
+
+        .donut-wrap { display: flex; align-items: center; gap: 2rem; }
+        .donut-legend { display: flex; flex-direction: column; gap: 0.6rem; }
+        .legend-item { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: var(--text-muted); }
+        .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    </style>
+</head>
+<body class="dashboard-mode">
+    <div id="toast" class="toast"></div>
+
+    <div class="dashboard-wrapper">
+        <!-- SIDEBAR — same as dashboard.html -->
+        <aside class="sidebar">
+            <a href="index.html" style="text-decoration:none;">
+                <div class="sidebar-brand" style="margin-bottom: 0.5rem;">GovAid.</div>
+            </a>
+            <div style="font-size:0.7rem; color:rgba(255,255,255,0.45); letter-spacing:0.12em; text-transform:uppercase; font-weight:600; margin-bottom:3rem;">Admin Console</div>
+            <nav>
+                <a href="index.html" class="nav-item" style="opacity:0.6; font-size:0.9rem; padding: 0.6rem 1.5rem; margin-bottom:1rem;">
+                    <i data-lucide="home" style="width:16px;"></i> Home
+                </a>
+                <button class="nav-item active" onclick="showTab('overview', this)">
+                    <i data-lucide="layout-dashboard" style="width:20px;"></i> Overview
+                </button>
+                <button class="nav-item" onclick="showTab('citizens', this)">
+                    <i data-lucide="users" style="width:20px;"></i> Citizens
+                </button>
+                <button class="nav-item" onclick="showTab('applications', this)">
+                    <i data-lucide="clipboard-check" style="width:20px;"></i> Applications
+                </button>
+                <button class="nav-item" onclick="showTab('schemes', this)">
+                    <i data-lucide="scroll-text" style="width:20px;"></i> Schemes
+                </button>
+            </nav>
+            <div style="margin-top: auto;">
+                <button class="nav-item" onclick="adminLogout()">
+                    <i data-lucide="log-out" style="width:20px;"></i> Logout
+                </button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="top-bar" style="margin-bottom:4rem;">
+                <div>
+                    <h2 style="font-size:2.5rem; color:var(--primary);" id="page-title">Dashboard Overview</h2>
+                    <p style="color:var(--text-muted); font-size:1.1rem;" id="page-sub">Real-time insights from your GovAid database.</p>
+                </div>
+                <div style="display:inline-flex; align-items:center; gap:0.5rem; background:var(--primary-soft); border:1px solid var(--glass-border); color:var(--primary); padding:0.4rem 1rem; border-radius:50px; font-size:0.8rem; font-weight:600;">
+                    <i data-lucide="shield-check" style="width:14px; height:14px;"></i> Admin
+                </div>
+            </header>
+
+            <!-- OVERVIEW TAB -->
+            <div id="tab-overview" class="tab-content active">
+                <div class="admin-stats-grid">
+                    <div class="admin-stat-card">
+                        <div class="stat-label">Total Citizens</div>
+                        <div class="stat-val" id="s-citizens">—</div>
+                        <div class="stat-sub">Registered users</div>
+                    </div>
+                    <div class="admin-stat-card blue">
+                        <div class="stat-label">Active Schemes</div>
+                        <div class="stat-val" id="s-schemes">—</div>
+                        <div class="stat-sub">Currently active</div>
+                    </div>
+                    <div class="admin-stat-card amber">
+                        <div class="stat-label">Total Applications</div>
+                        <div class="stat-val" id="s-apps">—</div>
+                        <div class="stat-sub">Filed to date</div>
+                    </div>
+                    <div class="admin-stat-card red">
+                        <div class="stat-label">Pending Review</div>
+                        <div class="stat-val" id="s-pending">—</div>
+                        <div class="stat-sub">Awaiting action</div>
+                    </div>
+                </div>
+
+                <div class="two-col">
+                    <div class="panel">
+                        <h3>Most Applied Schemes</h3>
+                        <div id="top-schemes-chart"></div>
+                    </div>
+                    <div class="panel">
+                        <h3>Occupation Distribution</h3>
+                        <div id="occupation-chart"></div>
+                    </div>
+                </div>
+                <div class="two-col">
+                    <div class="panel">
+                        <h3>Gender Distribution</h3>
+                        <div class="donut-wrap">
+                            <canvas id="gender-canvas" width="120" height="120"></canvas>
+                            <div class="donut-legend" id="gender-legend"></div>
+                        </div>
+                    </div>
+                    <div class="panel">
+                        <h3>Applications by Status</h3>
+                        <div class="donut-wrap">
+                            <canvas id="status-canvas" width="120" height="120"></canvas>
+                            <div class="donut-legend" id="status-legend"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CITIZENS TAB -->
+            <div id="tab-citizens" class="tab-content">
+                <div class="panel">
+                    <div class="table-header">
+                        <h3>Citizen Registry</h3>
+                        <input type="text" class="search-input" placeholder="Search by name, email..." oninput="searchCitizens(this.value)">
+                    </div>
+                    <table class="admin-table">
+                        <thead><tr><th>#</th><th>Name</th><th>Email</th><th>Gender</th><th>Occupation</th><th>Annual Income</th><th>Location</th><th>Applications</th></tr></thead>
+                        <tbody id="citizens-table"><tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--text-muted)">Loading...</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- APPLICATIONS TAB -->
+            <div id="tab-applications" class="tab-content">
+                <div class="panel">
+                    <div class="table-header">
+                        <h3>All Applications</h3>
+                        <span id="app-count" style="color:var(--text-muted); font-size:0.875rem;"></span>
+                    </div>
+                    <table class="admin-table">
+                        <thead><tr><th>#</th><th>Citizen</th><th>Scheme</th><th>Authority</th><th>Date Applied</th><th>Status</th><th>Action</th></tr></thead>
+                        <tbody id="applications-table"><tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--text-muted)">Loading...</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- SCHEMES TAB -->
+            <div id="tab-schemes" class="tab-content">
+                <div class="panel">
+                    <div class="table-header"><h3>Active Schemes Directory</h3></div>
+                    <table class="admin-table">
+                        <thead><tr><th>#</th><th>Scheme Name</th><th>Authority</th><th>Categories</th><th>Benefit</th></tr></thead>
+                        <tbody id="schemes-table"><tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--text-muted)">Loading...</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+    const API = '/api/admin';
+
+    // Auth guard
+    if (!sessionStorage.getItem('admin_token')) {
+        window.location.href = 'admin-login.html';
+    }
+
+    lucide.createIcons();
+
+    function adminLogout() {
+        sessionStorage.removeItem('admin_token');
+        window.location.href = 'admin-login.html';
+    }
+
+    function showToast(msg, type = 'success') {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.className = `toast show ${type}`;
+        setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    const TAB_META = {
+        overview:     { title: 'Dashboard Overview',     sub: 'Real-time insights from your GovAid database.' },
+        citizens:     { title: 'Citizen Registry',       sub: 'All registered citizens and their profile data.' },
+        applications: { title: 'Application Management', sub: 'Review and update citizen application statuses.' },
+        schemes:      { title: 'Schemes Directory',      sub: 'All active government schemes in the database.' },
+    };
+
+    function showTab(tab, btn) {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        document.getElementById('tab-' + tab).classList.add('active');
+        if (btn) btn.classList.add('active');
+        document.getElementById('page-title').textContent = TAB_META[tab].title;
+        document.getElementById('page-sub').textContent   = TAB_META[tab].sub;
+        if (tab === 'citizens')     loadCitizens();
+        if (tab === 'applications') loadApplications();
+        if (tab === 'schemes')      loadSchemes();
+        lucide.createIcons();
+    }
+
+    // ---- STATS / CHARTS ----
+    async function loadStats() {
+        try {
+            const res  = await fetch(API + '/stats');
+            const data = await res.json();
+            document.getElementById('s-citizens').textContent = data.totalCitizens;
+            document.getElementById('s-schemes').textContent  = data.totalSchemes;
+            document.getElementById('s-apps').textContent     = data.totalApplications;
+            document.getElementById('s-pending').textContent  = data.pendingApplications;
+            renderBarChart('top-schemes-chart', data.topSchemes,              'scheme_name', 'applications');
+            renderBarChart('occupation-chart',  data.occupationDistribution,  'occupation',  'count');
+            const gc = ['#1F514C','#10b981','#a3e635'];
+            const sc = ['#d97706','#3b82f6','#10b981','#dc2626'];
+            renderDonut('gender-canvas','gender-legend', data.genderDistribution,    'gender',      'count', gc);
+            renderDonut('status-canvas','status-legend', data.applicationsByStatus,  'status_name', 'count', sc);
+        } catch(e) { console.error('Stats load error:', e); }
+    }
+
+    function renderBarChart(id, data, labelKey, valueKey) {
+        if (!data || !data.length) return;
+        const max = Math.max(...data.map(d => parseInt(d[valueKey]) || 0)) || 1;
+        document.getElementById(id).innerHTML = data.map(d => {
+            const pct = ((parseInt(d[valueKey]) || 0) / max * 100).toFixed(1);
+            return `<div class="bar-row">
+                <span class="bar-label" title="${d[labelKey]}">${d[labelKey] || 'N/A'}</span>
+                <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
+                <span class="bar-count">${d[valueKey]}</span>
+            </div>`;
+        }).join('');
+    }
+
+    function renderDonut(canvasId, legendId, data, labelKey, valueKey, colors) {
+        if (!data || !data.length) return;
+        const canvas = document.getElementById(canvasId);
+        const ctx    = canvas.getContext('2d');
+        const total  = data.reduce((s, d) => s + (parseInt(d[valueKey]) || 0), 0);
+        const cx = 60, cy = 60, r = 48, inner = 30;
+        let angle = -Math.PI / 2;
+        ctx.clearRect(0, 0, 120, 120);
+        data.forEach((d, i) => {
+            const slice = ((parseInt(d[valueKey]) || 0) / total) * 2 * Math.PI;
+            ctx.beginPath(); ctx.moveTo(cx, cy);
+            ctx.arc(cx, cy, r, angle, angle + slice); ctx.closePath();
+            ctx.fillStyle = colors[i % colors.length]; ctx.fill();
+            angle += slice;
+        });
+        // inner circle (donut hole)
+        ctx.beginPath(); ctx.arc(cx, cy, inner, 0, 2 * Math.PI);
+        ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--surface').trim() || '#fff';
+        ctx.fill();
+
+        document.getElementById(legendId).innerHTML = data.map((d, i) => `
+            <div class="legend-item">
+                <div class="legend-dot" style="background:${colors[i % colors.length]}"></div>
+                ${d[labelKey]}: <strong style="color:var(--text-main); margin-left:4px">${d[valueKey]}</strong>
+            </div>`).join('');
+    }
+
+    // ---- CITIZENS ----
+    async function loadCitizens(search = '') {
+        try {
+            const res  = await fetch(API + '/citizens?search=' + encodeURIComponent(search));
+            const data = await res.json();
+            const tbody = document.getElementById('citizens-table');
+            if (!data.length) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--text-muted)">No citizens found.</td></tr>';
+                return;
+            }
+            const gBadge = g => g === 'MALE' ? 'status-approved' : g === 'FEMALE' ? 'status-rejected' : '';
+            tbody.innerHTML = data.map(c => `<tr>
+                <td style="color:var(--text-muted)">${c.citizen_id}</td>
+                <td><strong>${c.full_name}</strong></td>
+                <td style="color:var(--text-muted)">${c.email}</td>
+                <td><span class="status-badge ${gBadge(c.gender)}" style="font-size:0.7rem">${c.gender}</span></td>
+                <td>${c.occupation || '—'}</td>
+                <td>₹${(c.annual_income || 0).toLocaleString('en-IN')}</td>
+                <td>${[c.city, c.state_of_residence].filter(Boolean).join(', ')}</td>
+                <td><span class="status-badge ${c.applications > 0 ? 'status-approved' : ''}" style="font-size:0.7rem">${c.applications} applied</span></td>
+            </tr>`).join('');
+        } catch(e) {}
+    }
+
+    function searchCitizens(q) { loadCitizens(q); }
+
+    // ---- APPLICATIONS ----
+    async function loadApplications() {
+        try {
+            const res  = await fetch(API + '/applications');
+            const data = await res.json();
+            document.getElementById('app-count').textContent = data.length + ' total';
+            const tbody = document.getElementById('applications-table');
+            if (!data.length) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--text-muted)">No applications yet.</td></tr>';
+                return;
+            }
+            const statusClass = { 'Submitted': '', 'Under Review': '', 'Approved': 'status-approved', 'Rejected': 'status-rejected' };
+            tbody.innerHTML = data.map(a => `<tr>
+                <td style="color:var(--text-muted)">${a.id}</td>
+                <td><strong>${a.citizen_name}</strong><br><span style="color:var(--text-muted);font-size:0.75rem">ID: ${a.citizen_id}</span></td>
+                <td>${a.scheme_name}</td>
+                <td><span class="badge ${a.authority.includes('Central') ? 'badge-central' : 'badge-state'}">${a.authority}</span></td>
+                <td>${new Date(a.date).toLocaleDateString('en-IN')}</td>
+                <td><span class="status-badge ${statusClass[a.status] || ''}" style="font-size:0.7rem">${a.status}</span></td>
+                <td style="display:flex;gap:0.4rem;align-items:center">
+                    ${a.status !== 'Approved' ? `<button class="action-btn approve" onclick="updateStatus(${a.id},2)">✓ Approve</button>` : ''}
+                    ${a.status !== 'Rejected' && a.status !== 'Approved' ? `<button class="action-btn reject" onclick="updateStatus(${a.id},4)">✗ Reject</button>` : ''}
+                </td>
+            </tr>`).join('');
+        } catch(e) {}
+    }
+
+    async function updateStatus(appId, statusId) {
+        try {
+            const res = await fetch(API + '/applications/' + appId + '/status', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status_id: statusId })
+            });
+            const d = await res.json();
+            if (d.status === 'success') {
+                showToast(statusId === 2 ? 'Application approved!' : 'Application rejected.', statusId === 2 ? 'success' : 'error');
+                loadApplications();
+            }
+        } catch(e) {}
+    }
+
+    // ---- SCHEMES ----
+    async function loadSchemes() {
+        try {
+            const res    = await fetch('/api/schemes');
+            const schemes = await res.json();
+            document.getElementById('schemes-table').innerHTML = schemes.map((s, i) => `<tr>
+                <td style="color:var(--text-muted)">${i+1}</td>
+                <td><strong>${s.name}</strong></td>
+                <td><span class="badge ${s.authClass}">${s.auth}</span></td>
+                <td><span style="font-size:0.8rem;color:var(--text-muted)">${s.categories || 'General'}</span></td>
+                <td style="color:var(--secondary);font-weight:600">${s.benefit || '—'}</td>
+            </tr>`).join('');
+        } catch(e) {}
+    }
+
+    // Init
+    loadStats();
+    </script>
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login | GovAid</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body style="display:flex; align-items:center; justify-content:center; min-height:100vh; background: #EEEEF2;">
+
+    <div id="toast" class="toast"></div>
+
+    <div class="glass-container form-container" style="animation: fadeIn 0.5s ease;">
+        <a href="index.html" class="btn-icon" style="margin-bottom:1rem; display:inline-block; color:var(--text-main);">
+            <i data-lucide="arrow-left"></i>
+        </a>
+
+        <div style="display:inline-flex; align-items:center; gap:0.5rem; background:var(--primary-soft); border:1px solid var(--glass-border); color:var(--primary); padding:0.3rem 0.9rem; border-radius:50px; font-size:0.75rem; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; margin-bottom:1.25rem;">
+            <i data-lucide="shield" style="width:12px; height:12px;"></i> Admin Portal
+        </div>
+
+        <h2 style="font-size: 2rem; margin-bottom: 0.5rem;">Admin Access</h2>
+        <p style="color:var(--text-muted); margin-bottom: 2rem;">Restricted to authorised personnel only.</p>
+
+        <div id="error-msg" style="display:none; background:#FEF2F2; border:1px solid #FEE2E2; color:#991B1B; padding:0.75rem 1rem; border-radius:12px; font-size:0.875rem; margin-bottom:1rem;"></div>
+
+        <form onsubmit="handleAdminLogin(event)">
+            <div class="input-group">
+                <label>Username</label>
+                <div class="input-wrapper">
+                    <i data-lucide="user"></i>
+                    <input type="text" id="username" placeholder="admin" autocomplete="username" required>
+                </div>
+            </div>
+            <div class="input-group">
+                <label>Password</label>
+                <div class="input-wrapper">
+                    <i data-lucide="lock"></i>
+                    <input type="password" id="password" placeholder="••••••••" autocomplete="current-password" required>
+                </div>
+            </div>
+            <button type="submit" id="login-btn" class="btn btn-primary" style="width:100%; justify-content:center; margin-top:1rem;">
+                Sign In to Admin <i data-lucide="arrow-right"></i>
+            </button>
+        </form>
+
+        <p style="margin-top: 1.5rem; text-align: center; font-size: 0.875rem; color: var(--text-muted);">
+            Not an admin? <a href="login.html" style="color:var(--primary); font-weight:600; text-decoration:none;">Citizen Login</a>
+        </p>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        lucide.createIcons();
+
+        if (sessionStorage.getItem('admin_token')) {
+            window.location.href = 'admin.html';
+        }
+
+        async function handleAdminLogin(e) {
+            e.preventDefault();
+            const btn = document.getElementById('login-btn');
+            const err = document.getElementById('error-msg');
+            btn.innerHTML = 'Signing in...';
+            btn.disabled = true;
+            err.style.display = 'none';
+
+            try {
+                const res = await fetch('/api/admin/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: document.getElementById('username').value,
+                        password: document.getElementById('password').value
+                    })
+                });
+                const data = await res.json();
+                if (data.status === 'success') {
+                    sessionStorage.setItem('admin_token', data.token);
+                    window.location.href = 'admin.html';
+                } else {
+                    err.textContent = data.message || 'Invalid credentials.';
+                    err.style.display = 'block';
+                }
+            } catch (ex) {
+                err.textContent = 'Server connection failed.';
+                err.style.display = 'block';
+            } finally {
+                btn.innerHTML = 'Sign In to Admin <i data-lucide="arrow-right"></i>';
+                btn.disabled = false;
+                lucide.createIcons();
+            }
+        }
+    </script>
+</body>
+</html>

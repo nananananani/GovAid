@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register | GovAid</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body style="display:flex; align-items:center; justify-content:center; min-height:100vh; background: #EEEEF2;">
+
+    <div id="toast" class="toast"></div>
+
+    <div class="glass-container form-container" style="max-width: 600px; animation: fadeIn 0.5s ease;">
+        <a href="index.html" class="btn-icon" style="margin-bottom:1rem; display:inline-block; color:var(--text-main);">
+            <i data-lucide="arrow-left"></i>
+        </a>
+        <h2 style="font-size: 2rem; margin-bottom: 0.5rem;">Citizen Registration</h2>
+        <p style="color:var(--text-muted); margin-bottom: 2rem;">Fill in your details for automatic eligibility matching.</p>
+        
+        <form onsubmit="app.handleSignup(event)">
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="input-group">
+                    <label>First Name</label>
+                    <div class="input-wrapper">
+                        <i data-lucide="user"></i>
+                        <input type="text" name="first_name" required>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Last Name</label>
+                    <div class="input-wrapper">
+                        <i data-lucide="user"></i>
+                        <input type="text" name="last_name" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>Aadhaar Number (12 Digits)</label>
+                <div class="input-wrapper">
+                    <i data-lucide="credit-card"></i>
+                    <input type="text" name="aadhaar" maxlength="12" pattern="\d{12}" required>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>Email Address</label>
+                <div class="input-wrapper">
+                    <i data-lucide="mail"></i>
+                    <input type="email" name="email" required>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>Password</label>
+                <div class="input-wrapper">
+                    <i data-lucide="lock"></i>
+                    <input type="password" name="password" required>
+                </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="input-group">
+                    <label>Date of Birth</label>
+                    <div class="input-wrapper">
+                        <i data-lucide="calendar"></i>
+                        <input type="date" name="dob" required>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Gender</label>
+                    <div class="input-wrapper">
+                        <i data-lucide="users"></i>
+                        <select name="gender" required style="padding-left: 3.5rem;">
+                            <option value="MALE">Male</option>
+                            <option value="FEMALE">Female</option>
+                            <option value="OTHER">Other</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="input-group">
+                    <label>Annual Income (₹)</label>
+                    <div class="input-wrapper">
+                        <i data-lucide="indian-rupee"></i>
+                        <input type="number" name="income" required>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Occupation</label>
+                    <div class="input-wrapper">
+                        <i data-lucide="briefcase"></i>
+                        <select name="occupation" required style="padding-left: 3.5rem;">
+                            <option value="Farmer">Farmer</option>
+                            <option value="Student">Student</option>
+                            <option value="Unemployed">Unemployed</option>
+                            <option value="Employed">Salaried</option>
+                            <option value="Business">Business</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="input-group">
+                    <label>City</label>
+                    <div class="input-wrapper">
+                        <i data-lucide="map-pin"></i>
+                        <input type="text" name="city" required>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>State</label>
+                    <div class="input-wrapper">
+                        <i data-lucide="map"></i>
+                        <select name="state" required style="padding-left: 3.5rem;">
+                            <option value="Tamil Nadu">Tamil Nadu</option>
+                            <option value="Delhi">Delhi</option>
+                            <option value="Kerala">Kerala</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+
+            <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center; margin-top:1rem;">
+                Complete Registration
+            </button>
+        </form>
+        <p style="margin-top: 1.5rem; text-align: center; font-size: 0.875rem; color: var(--text-muted);">
+            Already have an account? <a href="login.html" style="color:var(--primary); font-weight:600; text-decoration:none;">Login here</a>
+        </p>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
